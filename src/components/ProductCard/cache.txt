@@ -1,0 +1,23 @@
+  useEffect(() => {
+    const loadImage = async () => {
+      if (product.imageUrl) {
+        const cache = await caches.open('product-images'); // Abre o cache com um nome específico
+        const cachedResponse = await cache.match(product.imageUrl); // Verifica se a imagem já está no cache
+
+        if (cachedResponse) {
+          // Se a URL estiver no cache, usa ela diretamente
+          setImageUrl(cachedResponse.url);
+        } else {
+          try {
+            // Caso contrário, busca a imagem do servidor
+            const url = await getImageByFilename(product.imageUrl);
+            setImageUrl(url);
+            // Armazena a resposta no cache
+            const response = await fetch(url);
+            await cache.put(product.imageUrl, response); // Adiciona a nova URL ao cache
+          } catch (error) {
+            console.error('Erro ao carregar a imagem:', error);
+          }
+        }
+      }
+    };
